@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { StyledSection } from './Section.styled';
@@ -7,56 +7,56 @@ import { FeedbackOptions } from 'components/FeedbackOptions/FeedbackOptions';
 import { Statistics } from 'components/Statistics/Statistics';
 import { Notification } from 'components/Notification/Notification';
 
-export class Section extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+export const Section = ({ title }) => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+
+  const onUpdateStats = evt => {
+    const targetName = evt.currentTarget.name;
+
+    switch (targetName) {
+      case 'good':
+        setGood(good + 1);
+        break;
+      case 'neutral':
+        setNeutral(neutral + 1);
+        break;
+      case 'bad':
+        setBad(bad + 1);
+        break;
+      default:
+        break;
+    }
   };
 
-  counterPositivePercentage() {
-    return Number.parseInt((this.state.good / this.counterTotal(this.state)) * 100
-    );
-  }
+  const totalFeedback = good + neutral + bad;
+  const positiveFeedbackPercentage = Number.parseInt(
+    (good / (good + neutral + bad)) * 100
+  );
+  const message = 'There is no feedback';
 
-  counterTotal = count =>
-    Object.values(count).reduce((item, total) => item + total);
-
-  onUpdateStates = e => {
-    const name = e.currentTarget.name;  
-    this.setState(prevState => ({ [name]: prevState[name] + 1 }));
-  };
-
-  render() {
-    const { good = 0, neutral = 0, bad = 0,} = this.state;
-    const totalCounter = this.counterTotal(this.state);
-    const positivePercentageCounter = this.counterPositivePercentage();
-    const message = 'There is no feedback'
-    return (
-
-      <StyledSection>
-        <Title title={this.props.title} />
-        <FeedbackOptions
-          onLeaveFeedback={this.onUpdateStates}
-          options={['good', 'neutral', 'bad']}
+  return (
+    <StyledSection>
+      <Title title={title} />
+      <FeedbackOptions
+        onLeaveFeedback={onUpdateStats}
+        options={['good', 'neutral', 'bad']}
+      />
+      {totalFeedback > 0 ? (
+        <Statistics
+          good={good}
+          neutral={neutral}
+          bad={bad}
+          total={totalFeedback}
+          positivePercentage={positiveFeedbackPercentage}
         />
-        {totalCounter > 0 ? (
-          <Statistics
-            good={good}
-            neutral={neutral}
-            bad={bad}
-            total={totalCounter}
-            positivePercentage={positivePercentageCounter}
-        
-          />
-        ) : (
-          <Notification
-            message={message}
-          />)}
-      </StyledSection>
-    );
-  }
-}
+      ) : (
+        <Notification message={message} />
+      )}
+    </StyledSection>
+  );
+};
 
 Section.propTypes = {
   title: PropTypes.string.isRequired,
