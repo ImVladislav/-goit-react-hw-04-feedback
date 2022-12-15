@@ -2,6 +2,7 @@ import { Box } from 'components/Box';
 import PropTypes from 'prop-types';
 import { Button } from './FeedbackOptions.styled';
 
+
 export const FeedbackOptions = ({ onLeaveFeedback, options }) => {
   return (
     <Box display="flex" mb="32px" justifyContent="space-between" width="250px">
